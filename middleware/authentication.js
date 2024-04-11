@@ -12,8 +12,8 @@ const auth=(req,res,next)=>{
     try {
         const payload=jwt.verify(token,process.env.JWT_SECRET)
         //ATTACH THE USER TO THE JOB ROUTES 
-        console.log('payload',payload);
-        req.user={userId:payload.userId,name:payload.name}
+        const testUser=payload.userId==='661703b822ecf1466cfda176'
+        req.user={userId:payload.userId,name:payload.name,testUser}
         next()
     } catch (error) {
         console.log('calling 2nd error');

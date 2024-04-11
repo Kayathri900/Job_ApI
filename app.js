@@ -1,10 +1,17 @@
 require('dotenv').config()
 require('express-async-errors')
+
+const path=require('path')
 //extra security packages 
 const helmet=require('helmet')
-const cors=require('cors')
 const xss=require('xss-clean')
 const rateLimiter=require('express-rate-limit')
+
+//swagger
+//const swaggerUI = require('swagger-ui-express');
+//const YAML = require('yamljs');
+//const swaggerDocument = YAML.load('./swagger.yaml');
+
 
 
 const express=require('express')
@@ -25,24 +32,23 @@ const notFound=require('./middleware/not-found')
 const errorHandlerMiddleware=require('./middleware/error-handler')
 
 //extre pacakges
-app.set('trust proxy',1)
-app.use(rateLimiter({
-	windowMs: 15 * 60 * 1000, // 15 minutes
-	limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
-}))
+app.use(express.static(path.resolve(__dirname,'./client/build')))
 app.use(express.json())
 
 app.use(helmet())
-app.use(cors())
 app.use(xss())
 
-app.get('/', (req, res) => {
-	res.send('<h1>Jobs API</h1><a href="/api-docs">Documentation</a>');
-  });
+
 //routes
 app.use('/api/v1/auth',authRouter)
 app.use('/api/v1/jobs',authenticatedUser,jobsRouter)
+//any other routes , call index.html
 
+app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, './client/build', 'index.html'));
+  });
+
+  
 app.use(notFound)
 app.use(errorHandlerMiddleware)
 
